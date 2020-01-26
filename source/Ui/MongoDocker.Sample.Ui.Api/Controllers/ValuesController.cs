@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MongoDocker.Sample.Domain.Contract.DTO;
@@ -67,6 +68,32 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
                 var key = await mongoDbService.InsertValueAsync(value);
 
                 return Ok(key);
+            }
+            catch (MongoDbCustomException ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of objects
+        /// </summary>
+        /// <returns>MongoDbRegistrer <see cref="MongoDbRegister"/></returns>
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<MongoDbRegister>))]
+        [ProducesResponseType(404)]
+        public ActionResult Get()
+        {
+            try
+            {
+                var result = mongoDbService.GetValues();
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(result);
             }
             catch (MongoDbCustomException ex)
             {
