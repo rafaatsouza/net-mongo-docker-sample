@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\ZUPPER\Documents\ProjetosGit\mongo-docker-sample\source\Infrastructure\MongoDocker.Sample.Infrastructure.Provider\MongoDocker.Sample.Infrastructure.Provider.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="2.10.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain\MongoDocker.Sample.Domain.Contract\MongoDocker.Sample.Domain.Contract.csproj" />
+    <ProjectReference Include="..\..\Domain\MongoDocker.Sample.Domain.Service\MongoDocker.Sample.Domain.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MongoDocker.Sample.Infrastructure.Provider.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

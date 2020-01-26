@@ -15,4 +15,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Domain\MongoDocker.Sample.Domain.Service\MongoDocker.Sample.Domain.Service.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\MongoDocker.Sample.Infrastructure.Provider\MongoDocker.Sample.Infrastructure.Provider.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MongoDocker.Sample.Ui.Api.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

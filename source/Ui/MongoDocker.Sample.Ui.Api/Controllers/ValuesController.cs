@@ -1,42 +1,118 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MongoDocker.Sample.Domain.Contract.DTO;
+using MongoDocker.Sample.Domain.Contract.Exception;
+using MongoDocker.Sample.Domain.Service.Interfaces;
 
 namespace MongoDocker.Sample.Ui.Api.Controllers
 {
+    /// <summary>
+    /// Controller responsible for create, request, update and delete a value
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        private readonly IMongoDbService mongoDbService;
+
+        /// <summary>
+        /// Receives IMongoDbService instance from dependency injection
+        /// </summary>
+        /// <param name="mongoDbService"></param>
+        public ValuesController(IMongoDbService mongoDbService)
         {
-            return new string[] { "value1", "value2" };
+            this.mongoDbService = mongoDbService
+                ?? throw new ArgumentNullException(nameof(mongoDbService));
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        /// <summary>
+        /// Returns full object base on its key.
+        /// </summary>
+        /// <param name="key">Object key</param>
+        /// <returns>MongoDbRegistrer <see cref="MongoDbRegister"/></returns>
+        [HttpGet("{key}")]
+        [ProducesResponseType(200, Type = typeof(MongoDbRegister))]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
-            return "value";
+            try
+            {
+                var result = await mongoDbService.GetValueAsync(key);
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(result);
+            }
+            catch (MongoDbCustomException ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        /// <summary>
+        /// Inserts new object.
+        /// </summary>
+        /// <param name="value">Object value</param>
+        /// <returns>Object identifier <see cref="Guid"/> </returns>
+        [ProducesResponseType(200, Type = typeof(Guid))]
+        [HttpPost("{value}")]
+        public async Task<IActionResult> PostAsync([FromRoute] string value)
         {
+            try
+            {
+                var key = await mongoDbService.InsertValueAsync(value);
+
+                return Ok(key);
+            }
+            catch (MongoDbCustomException ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        /// <summary>
+        /// Updates object value.
+        /// </summary>
+        /// <param name="key">Objects key</param>
+        /// <param name="value">Objects new value</param>
+        [ProducesResponseType(200)]
+        [HttpPut("{key}/{value}")]
+        public async Task<IActionResult> PutAsync([FromRoute] Guid key, [FromRoute] string value)
         {
+            try
+            {
+                await mongoDbService.UpdateValueAsync(key, value);
+
+                return Ok();
+            }
+            catch (MongoDbCustomException ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        /// <summary>
+        /// Deletes object.
+        /// </summary>
+        /// <param name="key">Objects key</param>
+        [ProducesResponseType(200)]
+        [HttpDelete("{key}")]
+        public async Task<IActionResult> DeleteAsync(Guid key)
         {
+            try
+            {
+                await mongoDbService.DeleteValueAsync(key);
+
+                return Ok();
+            }
+            catch (MongoDbCustomException ex)
+            {
+                return StatusCode((int)ex.StatusCode, ex.Message);
+            }
         }
     }
 }
