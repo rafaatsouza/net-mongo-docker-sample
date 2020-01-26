@@ -4,5 +4,32 @@
         <name>MongoDocker.Sample.Ui.Api</name>
     </assembly>
     <members>
+        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.GetAsync(System.Guid)">
+            <summary>
+            Returns full object base on its key.
+            </summary>
+            <param name="key">Object key</param>
+            <returns>MongoDbRegistrer <see cref="T:MongoDocker.Sample.Domain.Contract.DTO.MongoDbRegister"/></returns>
+        </member>
+        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.PostAsync(System.String)">
+            <summary>
+            Inserts new object.
+            </summary>
+            <param name="value">Object value</param>
+            <returns>Object identifier <see cref="T:System.Guid"/> </returns>
+        </member>
+        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.PutAsync(System.Guid,System.String)">
+            <summary>
+            Updates object value.
+            </summary>
+            <param name="key">Objects key</param>
+            <param name="value">Objects new value</param>
+        </member>
+        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.DeleteAsync(System.Guid)">
+            <summary>
+            Deletes object.
+            </summary>
+            <param name="key">Objects key</param>
+        </member>
     </members>
 </doc>

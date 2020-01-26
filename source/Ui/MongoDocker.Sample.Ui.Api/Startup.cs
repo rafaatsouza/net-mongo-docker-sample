@@ -7,11 +7,17 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using Microsoft.OpenApi.Models;
+using MongoDocker.Sample.Domain.Service.Interfaces;
+using MongoDocker.Sample.Infrastructure.Provider;
+using MongoDocker.Sample.Domain.Contract.DTO;
 
 namespace MongoDocker.Sample.Ui.Api
 {
     public class Startup
     {
+        private const string ContractXmlDocumentationName = "MongoDocker.Sample.Domain.Contract.xml";
+        private const string ServiceXmlDocumentationName = "MongoDocker.Sample.Domain.Service.xml";
+        private const string InfraXmlDocumentationName = "MongoDocker.Sample.Infrastructure.Provider.xml";
         private const string ApiXmlDocumentationName = "MongoDocker.Sample.Ui.Api.xml";
 
         public Startup(IConfiguration configuration)
@@ -23,6 +29,11 @@ namespace MongoDocker.Sample.Ui.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var mongoDbConfiguration = Configuration.GetSection("MongoDb").Get<MongoDbConfigurationValues>();
+
+            services.AddSingleton(mongoDbConfiguration);
+            services.AddSingleton<IMongoDbService, MongoDbService>();
+
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options =>
@@ -30,9 +41,9 @@ namespace MongoDocker.Sample.Ui.Api
                     options.SerializerSettings.Formatting = Formatting.Indented;
                 });
 
-            services.AddSwaggerGen(sa =>
+            services.AddSwaggerGen(s =>
             {
-                sa.SwaggerDoc("v1",
+                s.SwaggerDoc("v1",
                     new OpenApiInfo()
                     {
                         Title = "Quotes Mock Web API",
@@ -40,7 +51,10 @@ namespace MongoDocker.Sample.Ui.Api
                         Description = "Web API available to check stock action prices"
                     });
 
-                sa.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, ApiXmlDocumentationName));
+                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, ContractXmlDocumentationName));
+                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, ServiceXmlDocumentationName));
+                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, InfraXmlDocumentationName));
+                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, ApiXmlDocumentationName));
             });
         }
 
