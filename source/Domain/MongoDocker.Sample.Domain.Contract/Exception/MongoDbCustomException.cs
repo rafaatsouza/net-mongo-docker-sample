@@ -15,6 +15,9 @@ namespace MongoDocker.Sample.Domain.Contract.Exception
         public static MongoDbCustomError RegisterNotFound => 
             new MongoDbCustomError(HttpStatusCode.NotFound, "Register not found");
 
+        public static MongoDbCustomError UnavailableKey =>
+            new MongoDbCustomError(HttpStatusCode.NotFound, "Could not find a valid key for the register");
+
         protected MongoDbCustomError(HttpStatusCode statusCode, string error) : base (statusCode, error)
         {                
         }

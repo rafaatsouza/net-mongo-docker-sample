@@ -3,6 +3,7 @@ using MongoDocker.Sample.Domain.Contract.DTO;
 using MongoDocker.Sample.Domain.Contract.Exception;
 using MongoDocker.Sample.Domain.Service.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MongoDocker.Sample.Infrastructure.Provider
@@ -13,6 +14,12 @@ namespace MongoDocker.Sample.Infrastructure.Provider
         private readonly string mongoDatabaseName;
         private readonly string collectionName;
 
+        private const int InsertMaxAttempts = 3;
+
+        /// <summary>
+        /// Receives MongoDb configuration values through dependency injection
+        /// </summary>
+        /// <param name="mongoDbConfigurationValues"></param>
         public MongoDbService(MongoDbConfigurationValues mongoDbConfigurationValues)
         {
             if (mongoDbConfigurationValues == null)
@@ -45,27 +52,27 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
         async Task IMongoDbService.DeleteValueAsync(Guid key)
         {
-            var database = mongoClient.GetDatabase(mongoDatabaseName);
-            var collection = database.GetCollection<MongoDbRegister>(collectionName);
+            var collection = GetMongoCollection();
 
-            await collection.FindOneAndDeleteAsync(x => x.Key == key);
+            var deletedObject = await collection.FindOneAndDeleteAsync(x => x.Key == key);
+
+            if (deletedObject == null)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+            }
         }
 
         async Task<Guid> IMongoDbService.InsertValueAsync(string value)
         {
-            var database = mongoClient.GetDatabase(mongoDatabaseName);
-            var collection = database.GetCollection<MongoDbRegister>(collectionName);
-            var register = new MongoDbRegister(value);
-
-            await collection.InsertOneAsync(register);
+            var collection = GetMongoCollection();
+            var register = await InsertValueAsync(value, collection);
 
             return register.Key;
         }
 
         async Task IMongoDbService.UpdateValueAsync(Guid key, string newValue)
         {
-            var database = mongoClient.GetDatabase(mongoDatabaseName);
-            var collection = database.GetCollection<MongoDbRegister>(collectionName);
+            var collection = GetMongoCollection();
 
             var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
             var update = Builders<MongoDbRegister>.Update.Set(m => m.Value, newValue);
@@ -80,10 +87,63 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
         async Task<MongoDbRegister> IMongoDbService.GetValueAsync(Guid key)
         {
-            var database = mongoClient.GetDatabase(mongoDatabaseName);
-            var collection = database.GetCollection<MongoDbRegister>(collectionName);
+            var collection = GetMongoCollection();
 
-            return (await collection.FindAsync(x => x.Key == key)).FirstOrDefault();
+            var result = await collection.FindAsync(x => x.Key == key);
+
+            if (!result.Any())
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+            }
+
+            return result.FirstOrDefault();
+        }
+
+        IEnumerable<MongoDbRegister> IMongoDbService.GetValues()
+        {
+            var collection = GetMongoCollection();
+
+            return collection.AsQueryable();
+        }
+
+        private IMongoCollection<MongoDbRegister> GetMongoCollection()
+        {
+            var database = mongoClient.GetDatabase(mongoDatabaseName);
+            return database.GetCollection<MongoDbRegister>(collectionName);
+        }
+
+        private async Task<MongoDbRegister> InsertValueAsync(string value, IMongoCollection<MongoDbRegister> collection)
+        {
+            var register = new MongoDbRegister(value);
+            var attempt = 0;
+
+            while (true)
+            {
+                try
+                {
+                    await collection.InsertOneAsync(register);
+
+                    return register;
+                }
+                catch (MongoException ex)
+                {
+                    var duplicateKeyError = ex.Message.Contains("duplicate key error collection");
+
+                    if (duplicateKeyError && attempt < InsertMaxAttempts)
+                    {
+                        register.Key = Guid.NewGuid();
+                        attempt++;
+                    }
+                    else if (duplicateKeyError)
+                    {
+                        throw new MongoDbCustomException(MongoDbCustomError.UnavailableKey);
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+            }
         }
     }
 }
