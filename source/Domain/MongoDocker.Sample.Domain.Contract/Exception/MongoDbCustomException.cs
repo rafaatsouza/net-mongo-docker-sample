@@ -16,7 +16,12 @@ namespace MongoDocker.Sample.Domain.Contract.Exception
             new MongoDbCustomError(HttpStatusCode.NotFound, "Register not found");
 
         public static MongoDbCustomError UnavailableKey =>
-            new MongoDbCustomError(HttpStatusCode.NotFound, "Could not find a valid key for the register");
+            new MongoDbCustomError(HttpStatusCode.BadRequest, "Could not find a valid key for the register");
+
+        public static MongoDbCustomError TimeOutServer(string server)
+        {
+            return new MongoDbCustomError(HttpStatusCode.InternalServerError, $"Timeout while attempting to connect to server at {server}");
+        }            
 
         protected MongoDbCustomError(HttpStatusCode statusCode, string error) : base (statusCode, error)
         {                

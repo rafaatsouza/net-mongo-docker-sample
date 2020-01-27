@@ -41,6 +41,6 @@ namespace MongoDocker.Sample.Domain.Service.Interfaces
         /// Gets all register values
         /// </summary>
         /// <returns>Registers list <see cref="MongoDbRegister"/></returns>
-        IEnumerable<MongoDbRegister> GetValues();
+        Task<IEnumerable<MongoDbRegister>> GetValuesAsync();
     }
 }

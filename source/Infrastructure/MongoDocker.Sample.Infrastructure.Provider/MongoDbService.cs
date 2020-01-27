@@ -4,6 +4,8 @@ using MongoDocker.Sample.Domain.Contract.Exception;
 using MongoDocker.Sample.Domain.Service.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MongoDocker.Sample.Infrastructure.Provider
@@ -54,11 +56,18 @@ namespace MongoDocker.Sample.Infrastructure.Provider
         {
             var collection = GetMongoCollection();
 
-            var deletedObject = await collection.FindOneAndDeleteAsync(x => x.Key == key);
-
-            if (deletedObject == null)
+            try
             {
-                throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+                var deletedObject = await collection.FindOneAndDeleteAsync(x => x.Key == key);
+
+                if (deletedObject == null)
+                {
+                    throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+                }
+            }
+            catch (TimeoutException ex)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
             }
         }
 
@@ -77,11 +86,18 @@ namespace MongoDocker.Sample.Infrastructure.Provider
             var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
             var update = Builders<MongoDbRegister>.Update.Set(m => m.Value, newValue);
 
-            var updateResult = await collection.UpdateOneAsync(filter, update);
-
-            if (updateResult.IsModifiedCountAvailable && updateResult.ModifiedCount == 0)
+            try
             {
-                throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+                var updateResult = await collection.UpdateOneAsync(filter, update);
+
+                if (updateResult.IsModifiedCountAvailable && updateResult.ModifiedCount == 0)
+                {
+                    throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+                }
+            }
+            catch (TimeoutException ex)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
             }
         }
 
@@ -89,27 +105,49 @@ namespace MongoDocker.Sample.Infrastructure.Provider
         {
             var collection = GetMongoCollection();
 
-            var result = await collection.FindAsync(x => x.Key == key);
-
-            if (!result.Any())
+            try
             {
-                throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
-            }
+                var result = await collection.FindAsync(x => x.Key == key);
 
-            return result.FirstOrDefault();
+                if (!result.Any())
+                {
+                    throw new MongoDbCustomException(MongoDbCustomError.RegisterNotFound);
+                }
+
+                return result.FirstOrDefault();
+            }
+            catch (TimeoutException ex)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+            }
         }
 
-        IEnumerable<MongoDbRegister> IMongoDbService.GetValues()
+        async Task<IEnumerable<MongoDbRegister>> IMongoDbService.GetValuesAsync()
         {
             var collection = GetMongoCollection();
 
-            return collection.AsQueryable();
+            try
+            {
+                return await collection.AsQueryable().ToListAsync();
+            }
+            catch (TimeoutException ex)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+            }
         }
 
         private IMongoCollection<MongoDbRegister> GetMongoCollection()
         {
             var database = mongoClient.GetDatabase(mongoDatabaseName);
-            return database.GetCollection<MongoDbRegister>(collectionName);
+
+            try
+            {
+                return database.GetCollection<MongoDbRegister>(collectionName);
+            }
+            catch (TimeoutException ex)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+            }
         }
 
         private async Task<MongoDbRegister> InsertValueAsync(string value, IMongoCollection<MongoDbRegister> collection)
@@ -143,7 +181,24 @@ namespace MongoDocker.Sample.Infrastructure.Provider
                         throw ex;
                     }
                 }
+                catch (TimeoutException ex)
+                {
+                    throw new MongoDbCustomException(MongoDbCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                }
             }
+        }
+
+        private string GetMongoServerAddressFromTimeoutException(TimeoutException ex)
+        {
+            var reg = new Regex(@"((?<![\w\d])localhost(?![\w\d])(\:(\d+)))");
+            
+            var regMatches = reg.Matches(ex.Message)?
+                .Cast<Match>()
+                .Where(m => m.Success)?
+                .Select(m => m.Value)
+                .Distinct();
+
+            return regMatches?.FirstOrDefault() ?? "<unspecified>";
         }
     }
 }
