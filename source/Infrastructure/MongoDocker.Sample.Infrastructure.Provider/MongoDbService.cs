@@ -107,7 +107,8 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
             try
             {
-                var result = await collection.FindAsync(x => x.Key == key);
+                var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
+                var result = await collection.FindAsync(filter);
 
                 if (!result.Any())
                 {
