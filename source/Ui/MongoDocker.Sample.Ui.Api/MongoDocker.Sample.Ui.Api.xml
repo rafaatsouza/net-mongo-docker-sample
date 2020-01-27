@@ -29,7 +29,7 @@
             <param name="value">Object value</param>
             <returns>Object identifier <see cref="T:System.Guid"/> </returns>
         </member>
-        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.GetAsync">
+        <member name="M:MongoDocker.Sample.Ui.Api.Controllers.ValuesController.GetAllAsync">
             <summary>
             Returns a list of objects
             </summary>
