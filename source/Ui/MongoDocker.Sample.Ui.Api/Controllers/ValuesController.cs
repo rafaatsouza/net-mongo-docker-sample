@@ -85,7 +85,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MongoDbRegister>))]
         [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
             try
             {
