@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MongoDocker.Sample.Domain.Contract.DTO;
@@ -89,9 +90,9 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
             {
                 var result = await mongoDbService.GetValuesAsync();
 
-                if (result == null)
+                if (!result.Any())
                 {
-                    return NotFound();
+                    return NoContent();
                 }
 
                 return Ok(result);
