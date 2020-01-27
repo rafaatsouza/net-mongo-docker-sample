@@ -36,7 +36,7 @@
             <param name="key">Register's key</param>
             <returns>Registers object <see cref="T:MongoDocker.Sample.Domain.Contract.DTO.MongoDbRegister"/></returns>
         </member>
-        <member name="M:MongoDocker.Sample.Domain.Service.Interfaces.IMongoDbService.GetValues">
+        <member name="M:MongoDocker.Sample.Domain.Service.Interfaces.IMongoDbService.GetValuesAsync">
             <summary>
             Gets all register values
             </summary>

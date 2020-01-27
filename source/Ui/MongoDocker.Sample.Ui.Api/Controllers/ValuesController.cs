@@ -34,7 +34,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <returns>MongoDbRegistrer <see cref="MongoDbRegister"/></returns>
         [HttpGet("{key}")]
         [ProducesResponseType(200, Type = typeof(MongoDbRegister))]
-        [ProducesResponseType(404)]
+        [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
             try
@@ -60,6 +60,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <param name="value">Object value</param>
         /// <returns>Object identifier <see cref="Guid"/> </returns>
         [ProducesResponseType(200, Type = typeof(Guid))]
+        [ProducesResponseType(400, Type = typeof(MongoDbCustomException))]
         [HttpPost("{value}")]
         public async Task<IActionResult> PostAsync([FromRoute] string value)
         {
@@ -81,12 +82,12 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <returns>MongoDbRegistrer <see cref="MongoDbRegister"/></returns>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<MongoDbRegister>))]
-        [ProducesResponseType(404)]
-        public ActionResult Get()
+        [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
+        public async Task<IActionResult> GetAsync()
         {
             try
             {
-                var result = mongoDbService.GetValues();
+                var result = await mongoDbService.GetValuesAsync();
 
                 if (result == null)
                 {
@@ -107,6 +108,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <param name="key">Objects key</param>
         /// <param name="value">Objects new value</param>
         [ProducesResponseType(200)]
+        [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         [HttpPut("{key}/{value}")]
         public async Task<IActionResult> PutAsync([FromRoute] Guid key, [FromRoute] string value)
         {
@@ -127,6 +129,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// </summary>
         /// <param name="key">Objects key</param>
         [ProducesResponseType(200)]
+        [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         [HttpDelete("{key}")]
         public async Task<IActionResult> DeleteAsync(Guid key)
         {
