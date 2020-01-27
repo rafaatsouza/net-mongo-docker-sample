@@ -54,6 +54,11 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
         async Task IMongoDbService.DeleteValueAsync(Guid key)
         {
+            if (key == Guid.Empty)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.KeyNotInformed);
+            }
+
             var collection = GetMongoCollection();
 
             try
@@ -81,6 +86,11 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
         async Task IMongoDbService.UpdateValueAsync(Guid key, string newValue)
         {
+            if (key == Guid.Empty)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.KeyNotInformed);
+            }
+
             var collection = GetMongoCollection();
 
             var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
@@ -103,6 +113,11 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
         async Task<MongoDbRegister> IMongoDbService.GetValueAsync(Guid key)
         {
+            if (key == Guid.Empty)
+            {
+                throw new MongoDbCustomException(MongoDbCustomError.KeyNotInformed);
+            }
+
             var collection = GetMongoCollection();
 
             try

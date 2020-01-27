@@ -12,6 +12,9 @@ namespace MongoDocker.Sample.Domain.Contract.Exception
 
     public class MongoDbCustomError : CustomError
     {
+        public static MongoDbCustomError KeyNotInformed =>
+            new MongoDbCustomError(HttpStatusCode.BadRequest, "Informed key is null or empty");
+
         public static MongoDbCustomError RegisterNotFound => 
             new MongoDbCustomError(HttpStatusCode.NotFound, "Register not found");
 

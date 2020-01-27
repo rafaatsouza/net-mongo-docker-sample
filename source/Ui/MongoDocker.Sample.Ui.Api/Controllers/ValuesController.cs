@@ -35,6 +35,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <returns>MongoDbRegistrer <see cref="MongoDbRegister"/></returns>
         [HttpGet("{key}")]
         [ProducesResponseType(200, Type = typeof(MongoDbRegister))]
+        [ProducesResponseType(400, Type = typeof(MongoDbCustomException))]
         [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
@@ -109,6 +110,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// <param name="key">Objects key</param>
         /// <param name="value">Objects new value</param>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(MongoDbCustomException))]
         [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         [HttpPut("{key}/{value}")]
         public async Task<IActionResult> PutAsync([FromRoute] Guid key, [FromRoute] string value)
@@ -130,6 +132,7 @@ namespace MongoDocker.Sample.Ui.Api.Controllers
         /// </summary>
         /// <param name="key">Objects key</param>
         [ProducesResponseType(200)]
+        [ProducesResponseType(400, Type = typeof(MongoDbCustomException))]
         [ProducesResponseType(404, Type = typeof(MongoDbCustomException))]
         [HttpDelete("{key}")]
         public async Task<IActionResult> DeleteAsync(Guid key)
