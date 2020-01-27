@@ -6,10 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.IO;
-using Microsoft.OpenApi.Models;
 using MongoDocker.Sample.Domain.Service.Interfaces;
 using MongoDocker.Sample.Infrastructure.Provider;
 using MongoDocker.Sample.Domain.Contract.DTO;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace MongoDocker.Sample.Ui.Api
 {
@@ -44,11 +44,11 @@ namespace MongoDocker.Sample.Ui.Api
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1",
-                    new OpenApiInfo()
+                    new Info()
                     {
-                        Title = "Quotes Mock Web API",
+                        Title = "MongoDocker Web API",
                         Version = "v1",
-                        Description = "Web API available to check stock action prices"
+                        Description = ".NET Core Web API created to simulate simple MongoDb interaction"
                     });
 
                 s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, ContractXmlDocumentationName));
