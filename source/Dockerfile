@@ -11,4 +11,5 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 COPY --from=build /app .
+RUN rm *.pdb *.Development.json
 ENTRYPOINT ["dotnet", "MongoDocker.Sample.Ui.Api.dll"]
