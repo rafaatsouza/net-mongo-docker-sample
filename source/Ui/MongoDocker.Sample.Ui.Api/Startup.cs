@@ -10,6 +10,8 @@ using MongoDocker.Sample.Domain.Service.Interfaces;
 using MongoDocker.Sample.Infrastructure.Provider;
 using MongoDocker.Sample.Domain.Contract.DTO;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.Extensions.Logging;
+using MongoDocker.Sample.Ui.Api.Middlewares;
 
 namespace MongoDocker.Sample.Ui.Api
 {
@@ -41,6 +43,11 @@ namespace MongoDocker.Sample.Ui.Api
                     options.SerializerSettings.Formatting = Formatting.Indented;
                 });
 
+            services.AddLogging(options =>
+            {
+                options.AddSeq(Configuration.GetSection("LogSeq"));
+            });
+
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1",
@@ -69,6 +76,7 @@ namespace MongoDocker.Sample.Ui.Api
                 app.UseHsts();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
