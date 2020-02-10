@@ -3,9 +3,17 @@ version: '3.7'
 services:
   mongo:
     image: mongo:3.6.17
+  logseq:
+    image: datalust/seq:5.1
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 3000:3000
+      - 5341:5341
   api:
     build: .
     ports:
-      - 8080:80
+      - 80:80 
     depends_on:
       - mongo
+      - logseq
