@@ -50,6 +50,7 @@ namespace MongoDocker.Sample.Infrastructure.Provider
             mongoClient = new MongoClient(mongoDbConfigurationValues.Server);
 
             MongoDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
+            MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
         }
 
         async Task IMongoDbService.DeleteValueAsync(Guid key)
@@ -123,7 +124,7 @@ namespace MongoDocker.Sample.Infrastructure.Provider
             try
             {
                 var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
-                var result = await collection.FindAsync(filter);
+                var result = await collection.Find(filter).ToListAsync();
 
                 if (!result.Any())
                 {
