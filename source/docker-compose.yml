@@ -2,14 +2,22 @@ version: '3.7'
 
 services:
   mongo:
-    image: mongo:3.6.17
+    image: mongo:3.6.17 
+  logseqcli:
+    image: datalust/seqcli:latest
+    command:
+      - "bash -c \""
+      - "seqcli config -k connection.serverUrl -v https://logseq &&"
+      - "seqcli apikey create -t 'mongo-docker' --token=XQxfYTriAB0fJEXouJ4j\""
+    depends_on:
+      - logseq
   logseq:
     image: datalust/seq:5.1
     environment:
       - ACCEPT_EULA=Y
     ports:
-      - 3000:3000
-      - 5341:5341
+      - 2000:80
+      - 4000:5341
   api:
     build: .
     ports:
@@ -17,3 +25,4 @@ services:
     depends_on:
       - mongo
       - logseq
+      - logseqcli
