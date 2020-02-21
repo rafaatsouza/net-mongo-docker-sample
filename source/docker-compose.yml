@@ -4,11 +4,7 @@ services:
   mongo:
     image: mongo:3.6.17 
   logseqcli:
-    image: datalust/seqcli:latest
-    command:
-      - "bash -c \""
-      - "seqcli config -k connection.serverUrl -v https://logseq &&"
-      - "seqcli apikey create -t 'mongo-docker' --token=XQxfYTriAB0fJEXouJ4j\""
+    build: ./Infrastructure/MongoDocker.Sample.Infrastructure.Log/.
     depends_on:
       - logseq
   logseq:
