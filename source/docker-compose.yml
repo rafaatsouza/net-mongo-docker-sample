@@ -4,13 +4,15 @@ services:
   mongo:
     image: mongo:3.6.17 
   logseqcli:
-    build: ./Infrastructure/MongoDocker.Sample.Infrastructure.Log/.
+    image: datalust/seqcli:5.1.251
+    command: apikey create --title='mongo-docker' --token='XQxfYTriAB0fJEXouJ4j' --server=http://logseq
     depends_on:
       - logseq
   logseq:
     image: datalust/seq:5.1
     environment:
       - ACCEPT_EULA=Y
+      - SEQ_API_CORSALLOWEDORIGINS=logseqcli
     ports:
       - 2000:80
       - 4000:5341

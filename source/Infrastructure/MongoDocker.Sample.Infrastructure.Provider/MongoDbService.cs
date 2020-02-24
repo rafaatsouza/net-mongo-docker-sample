@@ -31,17 +31,17 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
             if (string.IsNullOrEmpty(mongoDbConfigurationValues.Server))
             {
-                throw new ArgumentException($"MongoDB server address is null or empty");
+                throw new ArgumentException($"{nameof(mongoDbConfigurationValues.Server)} is null or empty");
             }
 
             if (string.IsNullOrEmpty(mongoDbConfigurationValues.Database))
             {
-                throw new ArgumentException($"MongoDB database name is null or empty");
+                throw new ArgumentException($"{nameof(mongoDbConfigurationValues.Database)} is null or empty");
             }
 
             if (string.IsNullOrEmpty(mongoDbConfigurationValues.Collection))
             {
-                throw new ArgumentException($"MongoDB collection name is null or empty");
+                throw new ArgumentException($"{nameof(mongoDbConfigurationValues.Collection)} is null or empty");
             }
 
             mongoDatabaseName = mongoDbConfigurationValues.Database;
@@ -49,8 +49,8 @@ namespace MongoDocker.Sample.Infrastructure.Provider
 
             mongoClient = new MongoClient(mongoDbConfigurationValues.Server);
 
-            MongoDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
             MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
+            MongoDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
         }
 
         async Task IMongoDbService.DeleteValueAsync(Guid key)
@@ -124,7 +124,7 @@ namespace MongoDocker.Sample.Infrastructure.Provider
             try
             {
                 var filter = Builders<MongoDbRegister>.Filter.Eq(m => m.Key, key);
-                var result = await collection.Find(filter).ToListAsync();
+                var result = (await collection.FindAsync(filter)).ToList();
 
                 if (!result.Any())
                 {
