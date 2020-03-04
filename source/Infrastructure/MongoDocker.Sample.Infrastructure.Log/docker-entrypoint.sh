@@ -4,13 +4,13 @@ echo 'starting'
 
 SERVICE="http://logseq"
 
-until curl -fs $SERVICE  > /dev/null; 
+until curl -fs ${SERVICE}  > /dev/null; 
 do
-  >&2 echo "$SERVICE is unavailable - sleeping"
+  >&2 echo "${SERVICE} is unavailable - sleeping"
   sleep 2
 done
->&2 echo "$SERVICE is up"
+>&2 echo "${SERVICE} is up"
 
-seqcli apikey create --title='newapikey' --token='123456' --server=$SERVICE
+/bin/seqcli/seqcli apikey create --title='mongo-docker-api' --token='bEK8BeLxVlWi3cvgdBSe0D7ub8nix1p5' --server=$SERVICE
 
 exit 0
