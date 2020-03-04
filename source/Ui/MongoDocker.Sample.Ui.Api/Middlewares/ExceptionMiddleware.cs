@@ -23,7 +23,11 @@ namespace MongoDocker.Sample.Ui.Api.Middlewares
         {
             try
             {
+                logger.LogDebug("New http request: {@request}", httpContext.Request);
+
                 await next(httpContext);
+
+                logger.LogDebug("Response: {@request}", httpContext.Response);
             }
             catch (Exception ex)
             {
