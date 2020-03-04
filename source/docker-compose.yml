@@ -2,10 +2,23 @@ version: '3.7'
 
 services:
   mongo:
-    image: mongo:3.6.17
+    image: mongo:3.6.17 
+  logseqcli:
+    build: ./Infrastructure/MongoDocker.Sample.Infrastructure.Log/.
+    depends_on:
+      - logseq
+  logseq:
+    image: datalust/seq:5.1
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 2000:80
+      - 4000:5341
   api:
     build: .
     ports:
-      - 8080:80
+      - 80:80 
     depends_on:
       - mongo
+      - logseq
+      - logseqcli

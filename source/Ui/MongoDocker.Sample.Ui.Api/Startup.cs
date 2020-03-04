@@ -34,7 +34,7 @@ namespace MongoDocker.Sample.Ui.Api
             var mongoDbConfiguration = Configuration.GetSection("MongoDb").Get<MongoDbConfigurationValues>();
 
             services.AddSingleton(mongoDbConfiguration);
-            services.AddSingleton<IMongoDbService, MongoDbService>();
+            services.AddScoped<IMongoDbService, MongoDbService>();
 
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
