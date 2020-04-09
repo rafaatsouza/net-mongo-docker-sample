@@ -5,6 +5,8 @@ services:
     image: mongo:3.6.17 
   logseqcli:
     build: ./Infrastructure/MongoDocker.Sample.Infrastructure.Log/.
+    environment: 
+      - "LOG_TOKEN=${SEQ_LOG_TOKEN}"
     depends_on:
       - logseq
   logseq:
@@ -18,6 +20,8 @@ services:
     build: .
     ports:
       - 80:80 
+    environment: 
+      - LOG_TOKEN=${SEQ_LOG_TOKEN}
     depends_on:
       - mongo
       - logseq
