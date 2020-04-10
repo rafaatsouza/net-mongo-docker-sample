@@ -10,7 +10,7 @@ services:
     depends_on:
       - logseq
   logseq:
-    image: datalust/seq:5.1
+    image: datalust/seq:6.0.3455-pre
     environment:
       - ACCEPT_EULA=Y
     ports:
