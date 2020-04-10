@@ -1,7 +1,5 @@
 #!/bin/sh -e
 
-echo 'starting'
-
 SERVICE="http://logseq"
 
 until curl -fs ${SERVICE}  > /dev/null; 
@@ -11,6 +9,6 @@ do
 done
 >&2 echo "${SERVICE} is up"
 
-/bin/seqcli/seqcli apikey create --title='mongo-docker-api' --token='bEK8BeLxVlWi3cvgdBSe0D7ub8nix1p5' --server=$SERVICE
+/bin/seqcli/seqcli apikey create --title='mongo-docker-api' --token=${SEQ_LOG_TOKEN} --server=${SERVICE}
 
 exit 0
