@@ -48,9 +48,6 @@ namespace MongoDocker.Sample.Infrastructure.Provider
             collectionName = mongoDbConfigurationValues.Collection;
 
             mongoClient = new MongoClient(mongoDbConfigurationValues.Server);
-
-            MongoDB.Bson.BsonDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
-            MongoDefaults.GuidRepresentation = MongoDB.Bson.GuidRepresentation.Standard;
         }
 
         async Task IMongoDbService.DeleteValueAsync(Guid key)
