@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\ZUPPER\Documents\ProjetosGit\mongo-docker-sample\source\Domain\MongoDocker.Sample.Domain.Service\MongoDocker.Sample.Domain.Service.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\ZUPPER\Documents\ProjetosGit\mongo-docker-sample\source\Ui\MongoDocker.Sample.Ui.Api\MongoDocker.Sample.Ui.Api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
