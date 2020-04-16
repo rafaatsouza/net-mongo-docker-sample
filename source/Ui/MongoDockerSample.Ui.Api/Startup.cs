@@ -8,11 +8,15 @@ using Microsoft.OpenApi.Models;
 using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
 using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace MongoDockerSample.Ui.Api
 {
     public class Startup
     {
+        private const string DomainDocumentationXmlFileName = "MongoDockerSample.Core.Domain.xml";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -48,6 +52,9 @@ namespace MongoDockerSample.Ui.Api
                         Version = "v1",
                         Description = ".NET Core Web API created to simulate simple MongoDb interaction"
                     });
+
+
+                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, DomainDocumentationXmlFileName));
             });
         }
 
@@ -67,6 +74,7 @@ namespace MongoDockerSample.Ui.Api
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint($"/swagger/v1/swagger.json", "v1");
+                options.RoutePrefix = string.Empty;
             });
 
             app.UseMvc();
