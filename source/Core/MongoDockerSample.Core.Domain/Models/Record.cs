@@ -2,7 +2,7 @@
 
 namespace MongoDockerSample.Core.Domain.Models
 {
-    public class Register
+    public class Record
     {
         public Guid Key { get; set; }
 

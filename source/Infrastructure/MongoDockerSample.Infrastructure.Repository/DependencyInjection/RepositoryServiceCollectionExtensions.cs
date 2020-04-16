@@ -21,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddAutoMapper(typeof(RepositoryMapperProfile));
             
-            services.AddScoped<IRegisterRepository , RegisterRepository>();
+            services.AddScoped<IRecordRepository , RecordRepository>();
 
             return services;
         }

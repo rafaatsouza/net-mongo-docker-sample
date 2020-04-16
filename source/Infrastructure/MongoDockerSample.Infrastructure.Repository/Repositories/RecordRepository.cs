@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MongoDockerSample.Infrastructure.Repository.Repositories
 {
-    public class RegisterRepository : IRegisterRepository
+    public class RecordRepository : IRecordRepository
     {
         private readonly IMapper mapper;
         private readonly MongoClient mongoClient;
@@ -25,7 +25,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
         /// Receives MongoDb configuration values through dependency injection
         /// </summary>
         /// <param name="configurationValues"></param>
-        public RegisterRepository(IMapper mapper, RepositoryConfiguration configurationValues)
+        public RecordRepository(IMapper mapper, RepositoryConfiguration configurationValues)
         {
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
@@ -55,34 +55,26 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             mongoClient = new MongoClient(configurationValues.MongoServer);
         }
 
-        async Task<Guid> IRegisterRepository.InsertRegisterAsync(string value)
+        async Task<Guid> IRecordRepository.InsertRecordAsync(string value)
         {
             var collection = GetMongoCollection();
-            var register = await InsertValueAsync(value, collection);
+            var record = await InsertValueAsync(value, collection);
 
-            return register.Key;
+            return record.Key;
         }
 
-        async Task IRegisterRepository.UpdateRegisterAsync(Guid key, string newValue)
+        async Task<int> IRecordRepository.UpdateRecordAsync(Guid key, string newValue)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RepositoryCustomException(RepositoryCustomError.KeyNotInformed);
-            }
-
             var collection = GetMongoCollection();
 
-            var filter = Builders<RegisterDto>.Filter.Eq(m => m.Key, key);
-            var update = Builders<RegisterDto>.Update.Set(m => m.Value, newValue);
+            var filter = Builders<RecordDto>.Filter.Eq(m => m.Key, key);
+            var update = Builders<RecordDto>.Update.Set(m => m.Value, newValue);
 
             try
             {
                 var updateResult = await collection.UpdateOneAsync(filter, update);
 
-                if (updateResult.IsModifiedCountAvailable && updateResult.ModifiedCount == 0)
-                {
-                    throw new RepositoryCustomException(RepositoryCustomError.RegisterNotFound);
-                }
+                return updateResult.IsModifiedCountAvailable ? (int)updateResult.ModifiedCount : 0;
             }
             catch (TimeoutException ex)
             {
@@ -90,23 +82,15 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        async Task IRegisterRepository.DeleteRegisterAsync(Guid key)
+        async Task<int> IRecordRepository.DeleteRecordAsync(Guid key)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RepositoryCustomException(RepositoryCustomError.KeyNotInformed);
-            }
-
             var collection = GetMongoCollection();
 
             try
             {
-                var deletedObject = await collection.FindOneAndDeleteAsync(x => x.Key == key);
+                var deletedRecord = await collection.FindOneAndDeleteAsync(x => x.Key == key);
 
-                if (deletedObject == null)
-                {
-                    throw new RepositoryCustomException(RepositoryCustomError.RegisterNotFound);
-                }
+                return deletedRecord != null ? 1 : 0;
             }
             catch (TimeoutException ex)
             {
@@ -114,26 +98,21 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }        
 
-        async Task<Register> IRegisterRepository.GetRegisterAsync(Guid key)
+        async Task<Record> IRecordRepository.GetRecordAsync(Guid key)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RepositoryCustomException(RepositoryCustomError.KeyNotInformed);
-            }
-
             var collection = GetMongoCollection();
 
             try
             {
-                var filter = Builders<RegisterDto>.Filter.Eq(m => m.Key, key);
+                var filter = Builders<RecordDto>.Filter.Eq(m => m.Key, key);
                 var result = (await collection.FindAsync(filter)).ToList();
 
                 if (!result.Any())
                 {
-                    throw new RepositoryCustomException(RepositoryCustomError.RegisterNotFound);
+                    return null;
                 }
 
-                return mapper.Map<Register>(result.FirstOrDefault());
+                return mapper.Map<Record>(result.FirstOrDefault());
             }
             catch (TimeoutException ex)
             {
@@ -141,15 +120,20 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        async Task<IEnumerable<Register>> IRegisterRepository.GetRegistersAsync()
+        async Task<IEnumerable<Record>> IRecordRepository.GetRecordsAsync()
         {
             var collection = GetMongoCollection();
 
             try
             {
-                var registers = await collection.AsQueryable().ToListAsync();
+                var records = await collection.AsQueryable().ToListAsync();
 
-                return mapper.Map<List<Register>>(registers);
+                if (records == null || !records.Any())
+                {
+                    return new List<Record>();
+                }
+
+                return mapper.Map<List<Record>>(records);
             }
             catch (TimeoutException ex)
             {
@@ -157,13 +141,13 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        private IMongoCollection<RegisterDto> GetMongoCollection()
+        private IMongoCollection<RecordDto> GetMongoCollection()
         {
             var database = mongoClient.GetDatabase(mongoDatabaseName);
 
             try
             {
-                return database.GetCollection<RegisterDto>(collectionName);
+                return database.GetCollection<RecordDto>(collectionName);
             }
             catch (TimeoutException ex)
             {
@@ -171,18 +155,18 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        private async Task<RegisterDto> InsertValueAsync(string value, IMongoCollection<RegisterDto> collection)
+        private async Task<RecordDto> InsertValueAsync(string value, IMongoCollection<RecordDto> collection)
         {
-            var register = new RegisterDto(value);
+            var record = new RecordDto(value);
             var attempt = 0;
 
             while (true)
             {
                 try
                 {
-                    await collection.InsertOneAsync(register);
+                    await collection.InsertOneAsync(record);
 
-                    return register;
+                    return record;
                 }
                 catch (MongoException ex)
                 {
@@ -190,7 +174,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                     if (duplicateKeyError && attempt < InsertMaxAttempts)
                     {
-                        register.Key = Guid.NewGuid();
+                        record.Key = Guid.NewGuid();
                         attempt++;
                     }
                     else if (duplicateKeyError)

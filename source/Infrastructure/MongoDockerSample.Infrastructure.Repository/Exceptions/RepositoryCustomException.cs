@@ -1,4 +1,4 @@
-﻿using MongoDockerSample.Core.Domain.Exceptions;
+﻿using MongoDockerSample.Core.Domain.Exceptions.Custom;
 using System.Net;
 
 namespace MongoDockerSample.Infrastructure.Repository.Exceptions
@@ -12,14 +12,8 @@ namespace MongoDockerSample.Infrastructure.Repository.Exceptions
 
     public class RepositoryCustomError : CustomError
     {
-        public static RepositoryCustomError KeyNotInformed =>
-            new RepositoryCustomError(HttpStatusCode.BadRequest, "Informed key is null or empty");
-
-        public static RepositoryCustomError RegisterNotFound =>
-            new RepositoryCustomError(HttpStatusCode.NotFound, "Register not found");
-
         public static RepositoryCustomError UnavailableKey =>
-            new RepositoryCustomError(HttpStatusCode.BadRequest, "Could not find a valid key for the register");
+            new RepositoryCustomError(HttpStatusCode.BadRequest, "Could not find a valid key for the record");
 
         public static RepositoryCustomError TimeOutServer(string server)
         {
