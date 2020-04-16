@@ -34,21 +34,15 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [ProducesResponseType(400, Type = typeof(CustomException<CustomError>))]
         public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
-            try
-            {
-                var result = await registerService.GetRegisterAsync(key);
+            var result = await registerService.GetRegisterAsync(key);
 
-                if (result == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(result);
-            }
-            catch (CustomException<CustomError> ex)
+            if (result == null)
             {
-                return StatusCode((int)ex.StatusCode, ex.Message);
+                return NotFound();
             }
+
+            return Ok(result);
+
         }
 
         /// <summary>
@@ -61,16 +55,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpPost("{value}")]
         public async Task<IActionResult> PostAsync([FromRoute] string value)
         {
-            try
-            {
-                var key = await registerService.InsertRegisterAsync(value);
+            var key = await registerService.InsertRegisterAsync(value);
 
-                return Ok(key);
-            }
-            catch (CustomException<CustomError> ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
+            return Ok(key);
         }
 
         /// <summary>
@@ -82,21 +69,14 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [ProducesResponseType(400, Type = typeof(CustomException<CustomError>))]
         public async Task<IActionResult> GetAllAsync()
         {
-            try
-            {
-                var result = await registerService.GetRegistersAsync();
+            var result = await registerService.GetRegistersAsync();
 
-                if (!result.Any())
-                {
-                    return NoContent();
-                }
-
-                return Ok(result);
-            }
-            catch (CustomException<CustomError> ex)
+            if (!result.Any())
             {
-                return StatusCode((int)ex.StatusCode, ex.Message);
+                return NoContent();
             }
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -110,16 +90,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpPut("{key}/{value}")]
         public async Task<IActionResult> PutAsync([FromRoute] Guid key, [FromRoute] string value)
         {
-            try
-            {
-                await registerService.UpdateRegisterAsync(key, value);
+            await registerService.UpdateRegisterAsync(key, value);
 
-                return Ok();
-            }
-            catch (CustomException<CustomError> ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
+            return Ok();
         }
 
         /// <summary>
@@ -132,16 +105,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpDelete("{key}")]
         public async Task<IActionResult> DeleteAsync(Guid key)
         {
-            try
-            {
-                await registerService.DeleteRegisterAsync(key);
+            await registerService.DeleteRegisterAsync(key);
 
-                return Ok();
-            }
-            catch (CustomException<CustomError> ex)
-            {
-                return StatusCode((int)ex.StatusCode, ex.Message);
-            }
+            return Ok();
         }
     }
 }
