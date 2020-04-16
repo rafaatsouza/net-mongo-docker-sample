@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace MongoDockerSample.Ui.Api
 {
@@ -42,8 +42,8 @@ namespace MongoDockerSample.Ui.Api
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1",
-                    new Info()
-                    {
+                    new OpenApiInfo()
+                    {                        
                         Title = "MongoDocker Web API",
                         Version = "v1",
                         Description = ".NET Core Web API created to simulate simple MongoDb interaction"
