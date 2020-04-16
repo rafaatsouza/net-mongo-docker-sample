@@ -4,7 +4,7 @@ services:
   mongo:
     image: mongo:4.2.5 
   logseqcli:
-    build: ./Infrastructure/MongoDocker.Sample.Infrastructure.Log/.
+    build: ./Infrastructure/MongoDockerSample.Infrastructure.Log/.
     environment: 
       - "SEQ_LOG_TOKEN=${SEQ_LOG_TOKEN}"
     depends_on:
