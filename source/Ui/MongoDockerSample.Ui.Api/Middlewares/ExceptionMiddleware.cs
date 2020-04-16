@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net;
 using System;
 using System.Threading.Tasks;
+using MongoDockerSample.Core.Domain.Exceptions;
 
 namespace MongoDockerSample.Ui.Api.Middlewares
 {
@@ -31,15 +32,28 @@ namespace MongoDockerSample.Ui.Api.Middlewares
             }
             catch (Exception ex)
             {
-                logger.LogError("Unhandled exception: {@ex}", ex);
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            var httpStatusCode = HttpStatusCode.InternalServerError;
+
+            var customException = exception as CustomException;
+
+            if (customException != null)
+            {
+                logger.LogWarning("Custom exception: {@ex}", customException);
+                httpStatusCode = customException.StatusCode;
+            }
+            else
+            {
+                logger.LogError("Unhandled exception: {@ex}", exception);
+            }
+
             context.Response.ContentType = "text/plain";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int)httpStatusCode;
 
             return context.Response.WriteAsync(exception.Message);
         }
