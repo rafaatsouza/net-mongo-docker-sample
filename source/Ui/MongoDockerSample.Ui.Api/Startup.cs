@@ -15,8 +15,6 @@ namespace MongoDockerSample.Ui.Api
 {
     public class Startup
     {
-        private const string DomainDocumentationXmlFileName = "MongoDockerSample.Core.Domain.xml";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -52,9 +50,6 @@ namespace MongoDockerSample.Ui.Api
                         Version = "v1",
                         Description = ".NET Core Web API created to simulate simple MongoDb interaction"
                     });
-
-
-                s.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, DomainDocumentationXmlFileName));
             });
         }
 
