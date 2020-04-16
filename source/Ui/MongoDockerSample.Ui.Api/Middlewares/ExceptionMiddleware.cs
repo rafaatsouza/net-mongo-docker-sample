@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net;
 using System;
 using System.Threading.Tasks;
-using MongoDockerSample.Core.Domain.Exceptions;
+using MongoDockerSample.Core.Domain.Exceptions.Custom;
 
 namespace MongoDockerSample.Ui.Api.Middlewares
 {

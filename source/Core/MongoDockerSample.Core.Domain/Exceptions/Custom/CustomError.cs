@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace MongoDockerSample.Core.Domain.Exceptions
+namespace MongoDockerSample.Core.Domain.Exceptions.Custom
 {
     public abstract class CustomError
     {

@@ -8,7 +8,7 @@ namespace MongoDockerSample.Infrastructure.Repository
     {
         public RepositoryMapperProfile()
         {
-            CreateMap<RegisterDto, Register>();
+            CreateMap<RecordDto, Record>();
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IRegisterService , RegisterService>();
+            services.AddScoped<IRecordService , RecordService>();
 
             return services;
         }
