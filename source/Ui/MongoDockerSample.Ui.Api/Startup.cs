@@ -6,7 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace MongoDockerSample.Ui.Api
 {
@@ -25,12 +26,16 @@ namespace MongoDockerSample.Ui.Api
 
             services.AddRepository(repositoryConfiguration);
             services.AddServices();
-            
+
             services
-                .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddMvc(m =>
+                {
+                    m.EnableEndpointRouting = false;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.Formatting = Formatting.Indented;
+                    options.JsonSerializerOptions.WriteIndented = true;
                 });
             
             services.AddSwaggerGen(s =>
@@ -45,7 +50,7 @@ namespace MongoDockerSample.Ui.Api
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -56,6 +61,8 @@ namespace MongoDockerSample.Ui.Api
                 app.UseHsts();
             }
 
+            app.UseRouting();
+            app.UseSerilogRequestLogging();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseSwagger();
             app.UseSwaggerUI(options =>
