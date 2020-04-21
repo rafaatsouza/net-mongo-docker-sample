@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
 using Newtonsoft.Json;
-using Serilog;
 
 namespace MongoDockerSample.Ui.Api
 {
@@ -27,26 +25,14 @@ namespace MongoDockerSample.Ui.Api
 
             services.AddRepository(repositoryConfiguration);
             services.AddServices();
-
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .WriteTo.Seq(
-                    Configuration["LogSeq:ServerUrl"],
-                    apiKey: Configuration["LogSeq:ApiKey"])
-                .CreateLogger();
-
+            
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.Formatting = Formatting.Indented;
                 });
-
-            services.AddLogging(options =>
-            {
-                options.AddSeq(Configuration.GetSection("LogSeq"));
-            });
-
+            
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1",
