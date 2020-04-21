@@ -8,8 +8,7 @@ using Microsoft.OpenApi.Models;
 using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
 using Newtonsoft.Json;
-using System;
-using System.IO;
+using Serilog;
 
 namespace MongoDockerSample.Ui.Api
 {
@@ -28,6 +27,13 @@ namespace MongoDockerSample.Ui.Api
 
             services.AddRepository(repositoryConfiguration);
             services.AddServices();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .WriteTo.Seq(
+                    Configuration["LogSeq:ServerUrl"],
+                    apiKey: Configuration["LogSeq:ApiKey"])
+                .CreateLogger();
 
             services
                 .AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
