@@ -21,7 +21,7 @@ services:
     ports:
       - 80:80 
     environment: 
-      - "LogSeq__ApiKey=${SEQ_LOG_TOKEN}"
+      - "Serilog__WriteTo__0__Args__ApiKey=${SEQ_LOG_TOKEN}"
     depends_on:
       - mongo
       - logseq
