@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace MongoDockerSample.Ui.Api
@@ -11,12 +11,15 @@ namespace MongoDockerSample.Ui.Api
             CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseSerilog((hostingContext, loggerConfiguration) =>
-                {
-                    loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration);
-                });
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .UseSerilog((hostingContext, loggerConfiguration) =>
+            {
+                loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration);
+            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
     }
 }
