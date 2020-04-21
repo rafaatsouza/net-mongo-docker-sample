@@ -9,5 +9,4 @@ This is just a sample project in order to exemplify a .NET Core WebAPI hosted wi
 - [x] Docker compose
 - [x] Hexagonal Architecture
 - [x] Unit Tests
-- [x] .NET Core 3.0
-- [ ] .NET Core 3.1
+- [x] .NET Core 3.1
