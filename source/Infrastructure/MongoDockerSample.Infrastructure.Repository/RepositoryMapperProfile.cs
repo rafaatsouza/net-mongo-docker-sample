@@ -4,7 +4,7 @@ using MongoDockerSample.Infrastructure.Repository.Dtos;
 
 namespace MongoDockerSample.Infrastructure.Repository
 {
-    public class RepositoryMapperProfile : Profile
+    internal class RepositoryMapperProfile : Profile
     {
         public RepositoryMapperProfile()
         {
