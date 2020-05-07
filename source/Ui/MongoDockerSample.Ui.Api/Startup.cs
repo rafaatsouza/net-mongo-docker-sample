@@ -37,16 +37,18 @@ namespace MongoDockerSample.Ui.Api
                 {
                     options.JsonSerializerOptions.WriteIndented = true;
                 });
-            
+
             services.AddSwaggerGen(s =>
             {
-                s.SwaggerDoc("v1",
-                    new OpenApiInfo()
-                    {                        
-                        Title = "MongoDocker Web API",
-                        Version = "v1",
-                        Description = ".NET Core Web API created to simulate simple MongoDb interaction"
-                    });
+                var apiInfo = new OpenApiInfo()
+                {
+                    Title = "MongoDocker Web API",
+                    Version = "v1",
+                    Description = ".NET Core Web API created to simulate simple MongoDb interaction"
+                };
+
+                s.SwaggerDoc("v1", apiInfo);
+                s.SchemaFilter<SwaggerDefaultSchemaFilter>();
             });
         }
 
