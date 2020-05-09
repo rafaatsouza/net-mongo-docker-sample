@@ -7,7 +7,6 @@ using MongoDockerSample.Infrastructure.Repository.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MongoDockerSample.Infrastructure.Repository.Repositories
@@ -76,9 +75,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                 return updateResult.IsModifiedCountAvailable ? (int)updateResult.ModifiedCount : 0;
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -92,9 +91,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                 return deletedRecord != null ? 1 : 0;
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
             }
         }        
 
@@ -114,9 +113,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                 return mapper.Map<Record>(result.FirstOrDefault());
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -135,9 +134,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                 return mapper.Map<List<Record>>(records);
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -149,9 +148,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             {
                 return database.GetCollection<RecordDto>(collectionName);
             }
-            catch (TimeoutException ex)
+            catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -186,24 +185,11 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
                         throw ex;
                     }
                 }
-                catch (TimeoutException ex)
+                catch (TimeoutException)
                 {
-                    throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer(GetMongoServerAddressFromTimeoutException(ex)));
+                    throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
                 }
             }
-        }
-
-        private string GetMongoServerAddressFromTimeoutException(TimeoutException ex)
-        {
-            var reg = new Regex(@"((?<![\w\d])localhost(?![\w\d])(\:(\d+)))");
-
-            var regMatches = reg.Matches(ex.Message)?
-                .Cast<Match>()
-                .Where(m => m.Success)?
-                .Select(m => m.Value)
-                .Distinct();
-
-            return regMatches?.FirstOrDefault() ?? "<unspecified>";
         }
     }
 }
