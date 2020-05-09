@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MongoDockerSample.Core.Domain.Exceptions.Custom;
 using MongoDockerSample.Core.Domain.Models;
 using MongoDockerSample.Core.Domain.Services;
+using MongoDockerSample.Ui.Api.Dtos;
 
 namespace MongoDockerSample.Ui.Api.Controllers
 {
@@ -16,10 +18,13 @@ namespace MongoDockerSample.Ui.Api.Controllers
     [ApiController]
     public class RecordController : ControllerBase
     {
+        private readonly IMapper mapper;
         private readonly IRecordService recordService;
 
-        public RecordController(IRecordService recordService)
+        public RecordController(IMapper mapper, IRecordService recordService)
         {
+            this.mapper = mapper 
+                ?? throw new ArgumentNullException(nameof(mapper));
             this.recordService = recordService
                 ?? throw new ArgumentNullException(nameof(recordService));
         }
@@ -28,9 +33,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
         /// Returns full object base on its key.
         /// </summary>
         /// <param name="key">Object key</param>
-        /// <returns>MongoDbRegistrer <see cref="Record"/></returns>
+        /// <returns>MongoDbRegistrer <see cref="RecordDto"/></returns>
         [HttpGet("{key}")]
-        [ProducesResponseType(200, Type = typeof(Record))]
+        [ProducesResponseType(200, Type = typeof(RecordDto))]
         [ProducesResponseType(400, Type = typeof(CustomException))]
         public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
@@ -41,8 +46,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
                 return NotFound();
             }
 
-            return Ok(result);
+            var record = mapper.Map<RecordDto>(result);
 
+            return Ok(result);
         }
 
         /// <summary>
@@ -63,7 +69,7 @@ namespace MongoDockerSample.Ui.Api.Controllers
         /// <summary>
         /// Returns a list of objects
         /// </summary>
-        /// <returns><see cref="Record"/></returns>
+        /// <returns><see cref="RecordDto"/></returns>
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Record>))]
         [ProducesResponseType(400, Type = typeof(CustomException))]
@@ -76,7 +82,9 @@ namespace MongoDockerSample.Ui.Api.Controllers
                 return NoContent();
             }
 
-            return Ok(result);
+            var records = mapper.Map<IEnumerable<RecordDto>>(result);
+
+            return Ok(records);
         }
 
         /// <summary>

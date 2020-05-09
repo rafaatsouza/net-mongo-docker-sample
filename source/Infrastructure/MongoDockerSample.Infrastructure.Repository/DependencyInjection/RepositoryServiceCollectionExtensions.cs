@@ -18,8 +18,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             services.AddSingleton(configuration);
-
-            services.AddAutoMapper(typeof(RepositoryMapperProfile));
             
             services.AddScoped<IRecordRepository , RecordRepository>();
 
