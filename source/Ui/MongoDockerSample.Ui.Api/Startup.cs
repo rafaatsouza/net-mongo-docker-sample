@@ -8,6 +8,7 @@ using MongoDockerSample.Infrastructure.Repository;
 using MongoDockerSample.Ui.Api.Middlewares;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using AutoMapper;
 
 namespace MongoDockerSample.Ui.Api
 {
@@ -22,7 +23,16 @@ namespace MongoDockerSample.Ui.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var repositoryConfiguration = Configuration.GetSection("RepositoryConfiguration").Get<RepositoryConfiguration>();
+            var repositoryConfiguration = Configuration
+                .GetSection("RepositoryConfiguration").Get<RepositoryConfiguration>();
+
+            var mappingConfiguration = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new WebApiMapperProfile());
+                mc.AddProfile(new RepositoryMapperProfile());
+            });
+
+            services.AddSingleton(mappingConfiguration.CreateMapper());
 
             services.AddRepository(repositoryConfiguration);
             services.AddServices();
