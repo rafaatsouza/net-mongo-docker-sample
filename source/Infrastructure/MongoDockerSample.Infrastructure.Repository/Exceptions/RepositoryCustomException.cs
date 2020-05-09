@@ -15,11 +15,9 @@ namespace MongoDockerSample.Infrastructure.Repository.Exceptions
         public static RepositoryCustomError UnavailableKey =>
             new RepositoryCustomError(HttpStatusCode.BadRequest, "Could not find a valid key for the record");
 
-        public static RepositoryCustomError TimeOutServer(string server)
-        {
-            return new RepositoryCustomError(HttpStatusCode.InternalServerError, $"Timeout while attempting to connect to server at {server}");
-        }
-
+        public static RepositoryCustomError TimeOutServer =>
+            new RepositoryCustomError(HttpStatusCode.InternalServerError, $"Timeout while attempting to connect to MongoDB server");
+        
         protected RepositoryCustomError(HttpStatusCode statusCode, string error) : base(statusCode, error)
         {
         }
