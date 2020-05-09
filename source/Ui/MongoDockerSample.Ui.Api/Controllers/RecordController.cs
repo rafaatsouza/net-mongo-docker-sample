@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MongoDockerSample.Core.Domain.Exceptions.Custom;
-using MongoDockerSample.Core.Domain.Models;
 using MongoDockerSample.Core.Domain.Services;
 using MongoDockerSample.Ui.Api.Dtos;
 
@@ -71,7 +70,7 @@ namespace MongoDockerSample.Ui.Api.Controllers
         /// </summary>
         /// <returns><see cref="RecordDto"/></returns>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Record>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<RecordDto>))]
         [ProducesResponseType(400, Type = typeof(CustomException))]
         public async Task<IActionResult> GetAllAsync()
         {
