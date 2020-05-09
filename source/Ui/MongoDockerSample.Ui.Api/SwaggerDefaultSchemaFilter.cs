@@ -13,7 +13,7 @@ namespace MongoDockerSample.Ui.Api
 
         private static readonly string[] necessarySchemas = { "HttpStatusCode" };
 
-        private const string DomainNamespace = "MongoDockerSample";
+        private const string WebApiNamespace = "MongoDockerSample.Ui.Api";
 
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
@@ -32,7 +32,7 @@ namespace MongoDockerSample.Ui.Api
                         }
                     }
                 }
-                else if (!context.Type.FullName.StartsWith(DomainNamespace))
+                else if (!context.Type.FullName.StartsWith(WebApiNamespace))
                 {
                     var propertiesToRemove = schema.Properties.Keys.ToList();
 
