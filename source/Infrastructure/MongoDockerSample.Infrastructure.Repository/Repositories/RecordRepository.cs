@@ -19,34 +19,32 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
         private readonly string collectionName;
 
         private const int InsertMaxAttempts = 3;
+        private const string DuplicatedKeyMongoMessageError = "duplicate key error collection";
 
         /// <summary>
         /// Receives MongoDb configuration values through dependency injection
         /// </summary>
         /// <param name="configurationValues"></param>
-        public RecordRepository(IMapper mapper, RepositoryConfiguration configurationValues)
+        public RecordRepository(IMapper mapper, 
+            RepositoryConfiguration configurationValues)
         {
-            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            this.mapper = mapper 
+                ?? throw new ArgumentNullException(nameof(mapper));
 
             if (configurationValues == null)
-            {
                 throw new ArgumentNullException(nameof(configurationValues));
-            }
 
             if (string.IsNullOrEmpty(configurationValues.MongoServer))
-            {
-                throw new ArgumentException($"{nameof(configurationValues.MongoServer)} is null or empty");
-            }
+                throw new ArgumentException("Null or empty", 
+                    nameof(configurationValues.MongoServer));
 
             if (string.IsNullOrEmpty(configurationValues.MongoDatabase))
-            {
-                throw new ArgumentException($"{nameof(configurationValues.MongoDatabase)} is null or empty");
-            }
+                throw new ArgumentException("Null or empty", 
+                    nameof(configurationValues.MongoDatabase));
 
             if (string.IsNullOrEmpty(configurationValues.MongoCollection))
-            {
-                throw new ArgumentException($"{nameof(configurationValues.MongoCollection)} is null or empty");
-            }
+                throw new ArgumentException("Null or empty", 
+                    nameof(configurationValues.MongoCollection));
 
             mongoDatabaseName = configurationValues.MongoDatabase;
             collectionName = configurationValues.MongoCollection;
@@ -71,13 +69,16 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
             try
             {
-                var updateResult = await collection.UpdateOneAsync(filter, update);
+                var updateResult = await collection
+                    .UpdateOneAsync(filter, update);
 
-                return updateResult.IsModifiedCountAvailable ? (int)updateResult.ModifiedCount : 0;
+                return updateResult.IsModifiedCountAvailable 
+                    ? (int)updateResult.ModifiedCount : 0;
             }
             catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                throw new RepositoryCustomException(
+                    RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -87,13 +88,15 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
             try
             {
-                var deletedRecord = await collection.FindOneAndDeleteAsync(x => x.Key == key);
+                var deletedRecord = await collection
+                    .FindOneAndDeleteAsync(x => x.Key == key);
 
                 return deletedRecord != null ? 1 : 0;
             }
             catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                throw new RepositoryCustomException(
+                    RepositoryCustomError.TimeOutServer);
             }
         }        
 
@@ -106,7 +109,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
                 var filter = Builders<RecordDto>.Filter.Eq(m => m.Key, key);
                 var result = (await collection.FindAsync(filter)).ToList();
 
-                if (!result.Any())
+                if (result == null || !result.Any())
                 {
                     return null;
                 }
@@ -115,7 +118,8 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
             catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                throw new RepositoryCustomException(
+                    RepositoryCustomError.TimeOutServer);
             }
         }
 
@@ -125,7 +129,8 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
             try
             {
-                var records = await collection.AsQueryable().ToListAsync();
+                var records = await collection
+                    .AsQueryable().ToListAsync();
 
                 if (records == null || !records.Any())
                 {
@@ -136,30 +141,32 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
             catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                throw new RepositoryCustomException(
+                    RepositoryCustomError.TimeOutServer);
             }
         }
 
         private IMongoCollection<RecordDto> GetMongoCollection()
         {
-            var database = mongoClient.GetDatabase(mongoDatabaseName);
-
             try
             {
+                var database = mongoClient.GetDatabase(mongoDatabaseName);
+
                 return database.GetCollection<RecordDto>(collectionName);
             }
             catch (TimeoutException)
             {
-                throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                throw new RepositoryCustomException(
+                    RepositoryCustomError.TimeOutServer);
             }
         }
 
-        private async Task<RecordDto> InsertValueAsync(string value, IMongoCollection<RecordDto> collection)
+        private async Task<RecordDto> InsertValueAsync(
+            string value, IMongoCollection<RecordDto> collection)
         {
             var record = new RecordDto(value);
-            var attempt = 0;
-
-            while (true)
+            
+            for(var attempt = 0; attempt < InsertMaxAttempts; attempt++)
             {
                 try
                 {
@@ -169,27 +176,25 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
                 }
                 catch (MongoException ex)
                 {
-                    var duplicateKeyError = ex.Message.Contains("duplicate key error collection");
+                    var duplicateKeyError = ex.Message
+                        .Contains(DuplicatedKeyMongoMessageError);
 
-                    if (duplicateKeyError && attempt < InsertMaxAttempts)
-                    {
-                        record.Key = Guid.NewGuid();
-                        attempt++;
-                    }
-                    else if (duplicateKeyError)
-                    {
-                        throw new RepositoryCustomException(RepositoryCustomError.UnavailableKey);
-                    }
-                    else
+                    if (!duplicateKeyError)
                     {
                         throw ex;
                     }
+
+                    record.Key = Guid.NewGuid();
                 }
                 catch (TimeoutException)
                 {
-                    throw new RepositoryCustomException(RepositoryCustomError.TimeOutServer);
+                    throw new RepositoryCustomException(
+                        RepositoryCustomError.TimeOutServer);
                 }
             }
+
+            throw new RepositoryCustomException(
+                RepositoryCustomError.UnavailableKey);
         }
     }
 }
