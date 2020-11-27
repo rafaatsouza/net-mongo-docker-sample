@@ -28,9 +28,24 @@ namespace MongoDockerSample.Core.Application.Tests
         [Trait(nameof(IRecordService.InsertRecordAsync), "Success")]
         public async Task InsertRecordAsync_Sucess()
         {
-            await recordService.InsertRecordAsync(It.IsAny<string>());
+            var value = "test";
+
+            await recordService.InsertRecordAsync(value);
 
             recordRepositoryMock.Verify(r => r.InsertRecordAsync(It.IsAny<string>()));
+        }
+
+        [Fact]
+        [Trait(nameof(IRecordService.InsertRecordAsync), "Error_ValueNullOrEmpty")]
+        public async Task InsertRecordAsync_Error_ValueNullOrEmpty()
+        {
+            var result = await Assert.ThrowsAsync<RecordCustomException>(async () =>
+            {
+                await recordService.InsertRecordAsync("");
+            });
+
+            Assert.Equal(RecordCustomError.ValueNotInformed.StatusCode, result.StatusCode);
+            Assert.Equal(RecordCustomError.ValueNotInformed.Message, result.Message);
         }
 
         [Fact]
@@ -53,8 +68,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.UpdateRecordAsync), "EmptyKey")]
-        public async Task UpdateRecordAsync_EmptyKey()
+        [Trait(nameof(IRecordService.UpdateRecordAsync), "Error_EmptyKey")]
+        public async Task UpdateRecordAsync_Error_EmptyKey()
         {
             var key = Guid.Empty;
             var value = "test";
@@ -64,14 +79,29 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.UpdateRecordAsync(key, value);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.KeyNotInformed.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.KeyNotInformed.Message, result.Message);
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.UpdateRecordAsync), "RecordNotFound")]
-        public async Task UpdateRecordAsync_RecordNotFound()
+        [Trait(nameof(IRecordService.UpdateRecordAsync), "Error_ValueNullOrEmpty")]
+        public async Task UpdateRecordAsync_Error_ValueNullOrEmpty()
+        {
+            var key = Guid.NewGuid();
+            var value = "";
+
+            var result = await Assert.ThrowsAsync<RecordCustomException>(async () =>
+            {
+                await recordService.UpdateRecordAsync(key, value);
+            });
+
+            Assert.Equal(RecordCustomError.ValueNotInformed.StatusCode, result.StatusCode);
+            Assert.Equal(RecordCustomError.ValueNotInformed.Message, result.Message);
+        }
+
+        [Fact]
+        [Trait(nameof(IRecordService.UpdateRecordAsync), "Error_RecordNotFound")]
+        public async Task UpdateRecordAsync_Error_RecordNotFound()
         {
             var key = Guid.NewGuid();
             var value = "test";
@@ -90,7 +120,6 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.UpdateRecordAsync(key, value);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.RecordNotFound.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.RecordNotFound.Message, result.Message);
         }
@@ -113,8 +142,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.DeleteRecordAsync), "EmptyKey")]
-        public async Task DeleteRecordAsync_EmptyKey()
+        [Trait(nameof(IRecordService.DeleteRecordAsync), "Error_EmptyKey")]
+        public async Task DeleteRecordAsync_Error_EmptyKey()
         {
             var key = Guid.Empty;
 
@@ -123,14 +152,13 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.DeleteRecordAsync(key);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.KeyNotInformed.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.KeyNotInformed.Message, result.Message);
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.DeleteRecordAsync), "RecordNotFound")]
-        public async Task DeleteRecordAsync_RecordNotFound()
+        [Trait(nameof(IRecordService.DeleteRecordAsync), "Error_RecordNotFound")]
+        public async Task DeleteRecordAsync_Error_RecordNotFound()
         {
             var key = Guid.NewGuid();
 
@@ -147,7 +175,6 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.DeleteRecordAsync(key);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.RecordNotFound.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.RecordNotFound.Message, result.Message);
         }
@@ -180,8 +207,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.GetRecordAsync), "EmptyKey")]
-        public async Task GetRecordAsync_EmptyKey()
+        [Trait(nameof(IRecordService.GetRecordAsync), "Error_EmptyKey")]
+        public async Task GetRecordAsync_Error_EmptyKey()
         {
             var key = Guid.Empty;
 
@@ -190,14 +217,13 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.GetRecordAsync(key);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.KeyNotInformed.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.KeyNotInformed.Message, result.Message);
         }
         
         [Fact]
-        [Trait(nameof(IRecordService.GetRecordAsync), "RecordNotFound")]
-        public async Task GetRecordAsync_RecordNotFound()
+        [Trait(nameof(IRecordService.GetRecordAsync), "Error_RecordNotFound")]
+        public async Task GetRecordAsync_Error_RecordNotFound()
         {
             var key = Guid.NewGuid();
 
@@ -214,7 +240,6 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.GetRecordAsync(key);
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.RecordNotFound.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.RecordNotFound.Message, result.Message);
         }
@@ -249,8 +274,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IRecordService.GetRecordsAsync), "RecordNotFound")]
-        public async Task GetRecordsAsync_RecordNotFound()
+        [Trait(nameof(IRecordService.GetRecordsAsync), "Error_RecordNotFound")]
+        public async Task GetRecordsAsync_Error_RecordNotFound()
         {
             recordRepositoryMock
                 .Setup(r => r.GetRecordsAsync())
@@ -261,7 +286,6 @@ namespace MongoDockerSample.Core.Application.Tests
                 await recordService.GetRecordsAsync();
             });
 
-            Assert.NotNull(result);
             Assert.Equal(RecordCustomError.RecordNotFound.StatusCode, result.StatusCode);
             Assert.Equal(RecordCustomError.RecordNotFound.Message, result.Message);
         }
