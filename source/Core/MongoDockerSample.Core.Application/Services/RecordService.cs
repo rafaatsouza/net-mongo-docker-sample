@@ -39,7 +39,8 @@ namespace MongoDockerSample.Core.Application.Services
 
             if (records == null || !records.Any())
             {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+                throw new RecordCustomException(
+                    RecordCustomError.RecordNotFound);
             }
 
             return records;
@@ -48,38 +49,46 @@ namespace MongoDockerSample.Core.Application.Services
         Task<Guid> IRecordService.InsertRecordAsync(string value)
         {
             if (string.IsNullOrEmpty(value))
-                throw new RecordCustomException(RecordCustomError.ValueNotInformed);
+                throw new RecordCustomException(
+                    RecordCustomError.ValueNotInformed);
 
             return recordRepository.InsertRecordAsync(value);
         }
 
-        Task IRecordService.UpdateRecordAsync(Guid key, string newValue)
+        Task IRecordService.UpdateRecordAsync(
+            Guid key, string newValue)
         {
             ValidateKey(key);
 
             if (string.IsNullOrEmpty(newValue))
-                throw new RecordCustomException(RecordCustomError.ValueNotInformed);
+                throw new RecordCustomException(
+                    RecordCustomError.ValueNotInformed);
 
             return ExecuteUpdateRecordAsync(key, newValue);
         }
 
-        private async Task ExecuteUpdateRecordAsync(Guid key, string newValue)
+        private async Task ExecuteUpdateRecordAsync(
+            Guid key, string newValue)
         {
-            var updatedCount = await recordRepository.UpdateRecordAsync(key, newValue);
+            var updatedCount = await recordRepository
+                .UpdateRecordAsync(key, newValue);
 
             if (updatedCount == 0)
             {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+                throw new RecordCustomException(
+                    RecordCustomError.RecordNotFound);
             }
         }
 
         private async Task ExecuteDeleteRecordAsync(Guid key)
         {
-            var deletedCount = await recordRepository.DeleteRecordAsync(key);
+            var deletedCount = await recordRepository
+                .DeleteRecordAsync(key);
 
             if (deletedCount == 0)
             {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+                throw new RecordCustomException(
+                    RecordCustomError.RecordNotFound);
             }
         }
 
@@ -89,7 +98,8 @@ namespace MongoDockerSample.Core.Application.Services
 
             if (record == null)
             {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+                throw new RecordCustomException(
+                    RecordCustomError.RecordNotFound);
             }
 
             return record;
@@ -99,7 +109,8 @@ namespace MongoDockerSample.Core.Application.Services
         {
             if (key == null || key == Guid.Empty)
             {
-                throw new RecordCustomException(RecordCustomError.KeyNotInformed);
+                throw new RecordCustomException(
+                    RecordCustomError.KeyNotInformed);
             }
         }
     }
