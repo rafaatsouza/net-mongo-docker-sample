@@ -176,10 +176,10 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
                 }
                 catch (MongoException ex)
                 {
-                    var duplicateKeyError = ex.Message
+                    var duplicatedKeyError = ex.Message
                         .Contains(DuplicatedKeyMongoMessageError);
 
-                    if (!duplicateKeyError)
+                    if (!duplicatedKeyError)
                     {
                         throw ex;
                     }
