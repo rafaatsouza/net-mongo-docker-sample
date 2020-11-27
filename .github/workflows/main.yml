@@ -24,7 +24,6 @@ jobs:
 
       - name: Build
         run: dotnet build source/ --configuration $config --no-restore
-        run: dotnet build source/ --configuration $config --no-restore
       
       - name: set pr build number (if pr)
         id: PRNUMBER
