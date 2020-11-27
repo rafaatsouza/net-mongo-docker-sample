@@ -19,36 +19,18 @@ namespace MongoDockerSample.Core.Application.Services
                 ?? throw new ArgumentNullException(nameof(recordRepository));
         }
 
-        async Task IRecordService.DeleteRecordAsync(Guid key)
+        Task IRecordService.DeleteRecordAsync(Guid key)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RecordCustomException(RecordCustomError.KeyNotInformed);
-            }
+            ValidateKey(key);
 
-            var deletedCount = await recordRepository.DeleteRecordAsync(key);
-
-            if (deletedCount == 0)
-            {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
-            }
+            return ExecuteDeleteRecordAsync(key);
         }
 
-        async Task<Record> IRecordService.GetRecordAsync(Guid key)
+        Task<Record> IRecordService.GetRecordAsync(Guid key)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RecordCustomException(RecordCustomError.KeyNotInformed);
-            }
+            ValidateKey(key);
 
-            var record = await recordRepository.GetRecordAsync(key);
-
-            if (record == null)
-            {
-                throw new RecordCustomException(RecordCustomError.RecordNotFound);
-            }
-
-            return record;
+            return ExecuteGetRecordAsync(key);
         }
 
         async Task<IEnumerable<Record>> IRecordService.GetRecordsAsync() 
@@ -63,21 +45,61 @@ namespace MongoDockerSample.Core.Application.Services
             return records;
         }
         
-        async Task<Guid> IRecordService.InsertRecordAsync(string value)
-            => await recordRepository.InsertRecordAsync(value);
-
-        async Task IRecordService.UpdateRecordAsync(Guid key, string newValue)
+        Task<Guid> IRecordService.InsertRecordAsync(string value)
         {
-            if (key == Guid.Empty)
-            {
-                throw new RecordCustomException(RecordCustomError.KeyNotInformed);
-            }
+            if (string.IsNullOrEmpty(value))
+                throw new RecordCustomException(RecordCustomError.ValueNotInformed);
 
+            return recordRepository.InsertRecordAsync(value);
+        }
+
+        Task IRecordService.UpdateRecordAsync(Guid key, string newValue)
+        {
+            ValidateKey(key);
+
+            if (string.IsNullOrEmpty(newValue))
+                throw new RecordCustomException(RecordCustomError.ValueNotInformed);
+
+            return ExecuteUpdateRecordAsync(key, newValue);
+        }
+
+        private async Task ExecuteUpdateRecordAsync(Guid key, string newValue)
+        {
             var updatedCount = await recordRepository.UpdateRecordAsync(key, newValue);
 
             if (updatedCount == 0)
             {
                 throw new RecordCustomException(RecordCustomError.RecordNotFound);
+            }
+        }
+
+        private async Task ExecuteDeleteRecordAsync(Guid key)
+        {
+            var deletedCount = await recordRepository.DeleteRecordAsync(key);
+
+            if (deletedCount == 0)
+            {
+                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+            }
+        }
+
+        private async Task<Record> ExecuteGetRecordAsync(Guid key)
+        {
+            var record = await recordRepository.GetRecordAsync(key);
+
+            if (record == null)
+            {
+                throw new RecordCustomException(RecordCustomError.RecordNotFound);
+            }
+
+            return record;
+        }
+
+        private void ValidateKey(Guid key)
+        {
+            if (key == null || key == Guid.Empty)
+            {
+                throw new RecordCustomException(RecordCustomError.KeyNotInformed);
             }
         }
     }
