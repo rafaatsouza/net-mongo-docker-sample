@@ -1,3 +1,3 @@
 # mongo-docker-sample
 
-This is just a sample project to exemplify a .NET WebAPI hosted with Docker. It was built following the [Hexagonal Archictecture](https://alistair.cockburn.us/hexagonal-architecture/), uses MongoDB as the database, and [Seq](https://datalust.co/seq) to log.
+This is just a sample project to exemplify a .NET web API hosted with Docker. It was built following the [Hexagonal Archictecture](https://alistair.cockburn.us/hexagonal-architecture/), uses MongoDB as the database, and [Seq](https://datalust.co/seq) to log.
