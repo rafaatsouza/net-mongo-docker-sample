@@ -261,16 +261,22 @@ namespace MongoDockerSample.Core.Application.Tests
                 .Setup(r => r.GetRecordsAsync())
                 .ReturnsAsync(records);
             
-            var result = await recordService.GetRecordsAsync();
+            var results = await recordService.GetRecordsAsync();
 
-            Assert.NotNull(result);
-            Assert.Equal(records.Count, result.Count());
+            Assert.NotNull(results);
+            Assert.NotEmpty(results);
+            Assert.Equal(records.Count, results.Count());
 
-            for (var i = 0; i < records.Count; i++)
+            Assert.All(records, record => 
             {
-                Assert.Equal(records[i].Key, result.ToList()[i].Key);
-                Assert.Equal(records[i].Value, result.ToList()[i].Value);
-            }
+                var result = results
+                    .SingleOrDefault(r => r.Key == record.Key);
+
+                Assert.NotNull(result);
+
+                Assert.Equal(record.Key, result.Key);
+                Assert.Equal(record.Value, result.Value);
+            });
         }
 
         [Fact]
