@@ -7,7 +7,7 @@ namespace AutoMapper
     {
         public RepositoryMapperProfile()
         {
-            CreateMap<RecordDto, Record>();
+            CreateMap<EntryDto, Entry>();
         }
     }
 }

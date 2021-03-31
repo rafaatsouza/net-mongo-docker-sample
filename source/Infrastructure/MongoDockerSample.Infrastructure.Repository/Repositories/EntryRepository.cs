@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MongoDockerSample.Infrastructure.Repository.Repositories
 {
-    public class RecordRepository : IRecordRepository
+    public class EntryRepository : IEntryRepository
     {
         private readonly IMapper mapper;
         private readonly MongoClient mongoClient;
@@ -21,11 +21,14 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
         private const int InsertMaxAttempts = 3;
         private const string DuplicatedKeyMongoMessageError = "duplicate key error collection";
 
+        private readonly static ICollection<Entry> emptyEntries
+            = Enumerable.Empty<Entry>().ToArray();
+
         /// <summary>
         /// Receives MongoDb configuration values through dependency injection
         /// </summary>
         /// <param name="configurationValues"></param>
-        public RecordRepository(IMapper mapper, 
+        public EntryRepository(IMapper mapper, 
             RepositoryConfiguration configurationValues)
         {
             this.mapper = mapper 
@@ -52,7 +55,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             mongoClient = new MongoClient(configurationValues.MongoServer);
         }
 
-        async Task<Guid> IRecordRepository.InsertRecordAsync(string value)
+        async Task<Guid> IEntryRepository.InsertEntryAsync(string value)
         {
             var collection = GetMongoCollection();
             var record = await InsertValueAsync(value, collection);
@@ -60,12 +63,12 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             return record.Key;
         }
 
-        async Task<int> IRecordRepository.UpdateRecordAsync(Guid key, string newValue)
+        async Task<int> IEntryRepository.UpdateEntryAsync(Guid key, string newValue)
         {
             var collection = GetMongoCollection();
 
-            var filter = Builders<RecordDto>.Filter.Eq(m => m.Key, key);
-            var update = Builders<RecordDto>.Update.Set(m => m.Value, newValue);
+            var filter = Builders<EntryDto>.Filter.Eq(m => m.Key, key);
+            var update = Builders<EntryDto>.Update.Set(m => m.Value, newValue);
 
             try
             {
@@ -82,7 +85,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        async Task<int> IRecordRepository.DeleteRecordAsync(Guid key)
+        async Task<int> IEntryRepository.DeleteEntryAsync(Guid key)
         {
             var collection = GetMongoCollection();
 
@@ -100,13 +103,13 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }        
 
-        async Task<Record> IRecordRepository.GetRecordAsync(Guid key)
+        async Task<Entry> IEntryRepository.GetEntryAsync(Guid key)
         {
             var collection = GetMongoCollection();
 
             try
             {
-                var filter = Builders<RecordDto>.Filter.Eq(m => m.Key, key);
+                var filter = Builders<EntryDto>.Filter.Eq(m => m.Key, key);
                 var result = (await collection.FindAsync(filter)).ToList();
 
                 if (result == null || !result.Any())
@@ -114,7 +117,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
                     return null;
                 }
 
-                return mapper.Map<Record>(result.FirstOrDefault());
+                return mapper.Map<Entry>(result.FirstOrDefault());
             }
             catch (TimeoutException)
             {
@@ -123,7 +126,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        async Task<IEnumerable<Record>> IRecordRepository.GetRecordsAsync()
+        async Task<ICollection<Entry>> IEntryRepository.GetEntriesAsync()
         {
             var collection = GetMongoCollection();
 
@@ -134,10 +137,10 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                 if (records == null || !records.Any())
                 {
-                    return new List<Record>();
+                    return emptyEntries;
                 }
 
-                return mapper.Map<List<Record>>(records);
+                return mapper.Map<ICollection<Entry>>(records);
             }
             catch (TimeoutException)
             {
@@ -146,13 +149,13 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        private IMongoCollection<RecordDto> GetMongoCollection()
+        private IMongoCollection<EntryDto> GetMongoCollection()
         {
             try
             {
                 var database = mongoClient.GetDatabase(mongoDatabaseName);
 
-                return database.GetCollection<RecordDto>(collectionName);
+                return database.GetCollection<EntryDto>(collectionName);
             }
             catch (TimeoutException)
             {
@@ -161,10 +164,10 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
             }
         }
 
-        private async Task<RecordDto> InsertValueAsync(
-            string value, IMongoCollection<RecordDto> collection)
+        private async Task<EntryDto> InsertValueAsync(
+            string value, IMongoCollection<EntryDto> collection)
         {
-            var record = new RecordDto(value);
+            var record = new EntryDto(value);
             
             for(var attempt = 0; attempt < InsertMaxAttempts; attempt++)
             {
@@ -181,7 +184,7 @@ namespace MongoDockerSample.Infrastructure.Repository.Repositories
 
                     if (!duplicatedKeyError)
                     {
-                        throw ex;
+                        throw;
                     }
 
                     record.Key = Guid.NewGuid();
