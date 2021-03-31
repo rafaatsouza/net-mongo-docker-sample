@@ -5,14 +5,14 @@ using System;
 
 namespace MongoDockerSample.Infrastructure.Repository.Dtos
 {
-    internal class RecordDto
+    internal class EntryDto
     {
         [BsonId(IdGenerator = typeof(GuidGenerator)), BsonRepresentation(BsonType.String)]
         public Guid Key { get; set; }
 
         public string Value { get; set; }
 
-        public RecordDto(string value)
+        public EntryDto(string value)
         {
             Key = Guid.NewGuid();
             Value = value;

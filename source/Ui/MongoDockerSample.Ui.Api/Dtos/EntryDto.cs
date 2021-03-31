@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace MongoDockerSample.Core.Domain.Models
+namespace MongoDockerSample.Ui.Api.Dtos
 {
-    public class Record
+    public class EntryDto
     {
         public Guid Key { get; set; }
 
