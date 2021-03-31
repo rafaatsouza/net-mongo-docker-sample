@@ -99,8 +99,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IEntryService.UpdateEntryAsync), "Error_RecordNotFound")]
-        public async Task UpdateEntryAsync_Error_RecordNotFound()
+        [Trait(nameof(IEntryService.UpdateEntryAsync), "Error_EntryNotFound")]
+        public async Task UpdateEntryAsync_Error_EntryNotFound()
         {
             var key = Guid.NewGuid();
             var value = "test";
@@ -156,8 +156,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IEntryService.DeleteEntryAsync), "Error_RecordNotFound")]
-        public async Task DeleteEntryAsync_Error_RecordNotFound()
+        [Trait(nameof(IEntryService.DeleteEntryAsync), "Error_EntryNotFound")]
+        public async Task DeleteEntryAsync_Error_EntryNotFound()
         {
             var key = Guid.NewGuid();
 
@@ -216,8 +216,8 @@ namespace MongoDockerSample.Core.Application.Tests
         }
         
         [Fact]
-        [Trait(nameof(IEntryService.GetEntryAsync), "Error_RecordNotFound")]
-        public async Task GetEntryAsync_Error_RecordNotFound()
+        [Trait(nameof(IEntryService.GetEntryAsync), "Error_EntryNotFound")]
+        public async Task GetEntryAsync_Error_EntryNotFound()
         {
             var key = Guid.NewGuid();
 
@@ -270,20 +270,17 @@ namespace MongoDockerSample.Core.Application.Tests
         }
 
         [Fact]
-        [Trait(nameof(IEntryService.GetEntriesAsync), "Error_RecordNotFound")]
-        public async Task GetEntriesAsync_Error_RecordNotFound()
+        [Trait(nameof(IEntryService.GetEntriesAsync), "Error_EmptyEntries")]
+        public async Task GetEntriesAsync_Error_EmptyEntries()
         {
             entryRepositoryMock
                 .Setup(r => r.GetEntriesAsync())
-                .ReturnsAsync(new List<Domain.Models.Entry>());
+                .ReturnsAsync(new Domain.Models.Entry[0]);
 
-            var result = await Assert.ThrowsAsync<EntryCustomException>(async () =>
-            {
-                await entryService.GetEntriesAsync();
-            });
+            var result = await entryService.GetEntriesAsync();
 
-            Assert.Equal(EntryCustomError.RecordNotFound.StatusCode, result.StatusCode);
-            Assert.Equal(EntryCustomError.RecordNotFound.Message, result.Message);
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
     }
 }
