@@ -1,5 +1,3 @@
-# mongo-docker-sample
-==================================
 ![code-size](https://img.shields.io/github/languages/code-size/rafaatsouza/mongo-docker-sample)
 ![unit-test](https://github.com/rafaatsouza/mongo-docker-sample/workflows/unit-test/badge.svg)
 
