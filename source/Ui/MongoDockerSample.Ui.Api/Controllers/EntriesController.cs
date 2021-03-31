@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MongoDockerSample.Core.Domain.Exceptions.Custom;
 using MongoDockerSample.Core.Domain.Services;
 using MongoDockerSample.Ui.Api.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MongoDockerSample.Ui.Api.Controllers
 {
@@ -15,37 +15,37 @@ namespace MongoDockerSample.Ui.Api.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class RecordController : ControllerBase
+    public class EntriesController : ControllerBase
     {
         private readonly IMapper mapper;
-        private readonly IRecordService recordService;
+        private readonly IEntryService entryService;
 
-        public RecordController(IMapper mapper, IRecordService recordService)
+        public EntriesController(IMapper mapper, IEntryService entryService)
         {
             this.mapper = mapper 
                 ?? throw new ArgumentNullException(nameof(mapper));
-            this.recordService = recordService
-                ?? throw new ArgumentNullException(nameof(recordService));
+            this.entryService = entryService
+                ?? throw new ArgumentNullException(nameof(entryService));
         }
 
         /// <summary>
         /// Returns full object base on its key.
         /// </summary>
         /// <param name="key">Object key</param>
-        /// <returns>MongoDbRegistrer <see cref="RecordDto"/></returns>
+        /// <returns>MongoDbRegistrer <see cref="EntryDto"/></returns>
         [HttpGet("{key}")]
-        [ProducesResponseType(200, Type = typeof(RecordDto))]
+        [ProducesResponseType(200, Type = typeof(EntryDto))]
         [ProducesResponseType(400, Type = typeof(CustomException))]
         public async Task<IActionResult> GetAsync([FromRoute] Guid key)
         {
-            var result = await recordService.GetRecordAsync(key);
+            var result = await entryService.GetEntryAsync(key);
 
             if (result == null)
             {
                 return NotFound();
             }
 
-            var record = mapper.Map<RecordDto>(result);
+            var record = mapper.Map<EntryDto>(result);
 
             return Ok(result);
         }
@@ -60,7 +60,7 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpPost("{value}")]
         public async Task<IActionResult> PostAsync([FromRoute] string value)
         {
-            var key = await recordService.InsertRecordAsync(value);
+            var key = await entryService.InsertEntryAsync(value);
 
             return Ok(key);
         }
@@ -68,20 +68,20 @@ namespace MongoDockerSample.Ui.Api.Controllers
         /// <summary>
         /// Returns a list of objects
         /// </summary>
-        /// <returns><see cref="RecordDto"/></returns>
+        /// <returns><see cref="EntryDto"/></returns>
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<RecordDto>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<EntryDto>))]
         [ProducesResponseType(400, Type = typeof(CustomException))]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await recordService.GetRecordsAsync();
+            var result = await entryService.GetEntriesAsync();
 
             if (!result.Any())
             {
                 return NoContent();
             }
 
-            var records = mapper.Map<IEnumerable<RecordDto>>(result);
+            var records = mapper.Map<IEnumerable<EntryDto>>(result);
 
             return Ok(records);
         }
@@ -97,7 +97,7 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpPut("{key}/{value}")]
         public async Task<IActionResult> PutAsync([FromRoute] Guid key, [FromRoute] string value)
         {
-            await recordService.UpdateRecordAsync(key, value);
+            await entryService.UpdateEntryAsync(key, value);
 
             return Ok();
         }
@@ -112,7 +112,7 @@ namespace MongoDockerSample.Ui.Api.Controllers
         [HttpDelete("{key}")]
         public async Task<IActionResult> DeleteAsync(Guid key)
         {
-            await recordService.DeleteRecordAsync(key);
+            await entryService.DeleteEntryAsync(key);
 
             return Ok();
         }
