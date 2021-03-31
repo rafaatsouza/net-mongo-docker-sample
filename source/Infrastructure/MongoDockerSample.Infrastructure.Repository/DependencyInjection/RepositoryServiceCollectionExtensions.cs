@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton(configuration);
             
-            services.AddScoped<IRecordRepository , RecordRepository>();
+            services.AddScoped<IEntryRepository, EntryRepository>();
 
             return services;
         }

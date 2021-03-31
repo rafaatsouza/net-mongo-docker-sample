@@ -8,7 +8,7 @@ namespace MongoDockerSample.Ui.Api
     {
         public WebApiMapperProfile()
         {
-            CreateMap<Record, RecordDto>();
+            CreateMap<Entry, EntryDto>();
         }
     }
 }
