@@ -42,8 +42,6 @@ jobs:
           path: ${{github.workspace}}/${{env.file_name}}
 
       - name: Comment PR
-        uses: machine-learning-apps/pr-comment@1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+        uses: thollander/actions-comment-pull-request@v2
         with:
-          path: ${{env.file_name}}
+          filePath: ${{env.file_name}}
