@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   mongo:
-    image: mongo:4.2.5 
+    image: mongo:5.0.24
   logseqconfig:
     image: curlimages/curl:7.78.0
     command: >
