@@ -3,9 +3,15 @@ version: '3.7'
 services:
   mongo:
     image: mongo:4.2.5 
-  logseqcli:
-    build: ./Infrastructure/MongoDockerSample.Infrastructure.Log/.
-    environment: 
+  logseqconfig:
+    image: curlimages/curl:7.78.0
+    command: >
+      /bin/sh -c "
+      sleep 10;
+      until curl -fs logseq > /dev/null; do sleep 2; done;
+      echo 'logseq is up';
+      curl -X POST -H 'Content-Type: application/json' -d '{\"title\":\"mongo-docker-api\", \"token\":\"${SEQ_LOG_TOKEN}\"}' logseq/api/apikeys/;"
+    environment:
       - "SEQ_LOG_TOKEN=${SEQ_LOG_TOKEN}"
       - "SEQ_SERVER_URL=http://logseq"
     depends_on:
@@ -16,14 +22,14 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 2000:80
-      - 4000:5341
   api:
     build: .
     ports:
       - 80:80 
     environment: 
+      - "Serilog__WriteTo__0__Args__serverUrl=http://logseq"
       - "Serilog__WriteTo__0__Args__ApiKey=${SEQ_LOG_TOKEN}"
+      - "RepositoryConfiguration__MongoServer=mongodb://mongo"
     depends_on:
       - mongo
       - logseq
-      - logseqcli
