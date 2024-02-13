@@ -11,7 +11,7 @@ jobs:
       config: 'Release'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v1.7.2
         with:
@@ -42,7 +42,7 @@ jobs:
           path: ${{github.workspace}}/${{env.file_name}}
 
       - name: Comment PR
-        uses: machine-learning-apps/pr-comment@master
+        uses: machine-learning-apps/pr-comment@1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
         with:
