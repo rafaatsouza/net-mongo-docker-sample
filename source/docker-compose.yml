@@ -3,6 +3,7 @@ version: '3.7'
 services:
   mongo:
     image: mongo:5.0.24
+
   logseqconfig:
     image: curlimages/curl:7.78.0
     command: >
@@ -13,15 +14,16 @@ services:
       curl -X POST -H 'Content-Type: application/json' -d '{\"title\":\"mongo-docker-api\", \"token\":\"${SEQ_LOG_TOKEN}\"}' logseq/api/apikeys/;"
     environment:
       - "SEQ_LOG_TOKEN=${SEQ_LOG_TOKEN}"
-      - "SEQ_SERVER_URL=http://logseq"
     depends_on:
       - logseq
+
   logseq:
     image: datalust/seq:2020.1
     environment:
       - ACCEPT_EULA=Y
     ports:
       - 2000:80
+
   api:
     build: .
     ports:
